@@ -9,11 +9,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 #include "telnet.h"
+#include "qttelnet.h"
+#include <QDebug>
 
 Telnet::Telnet(QObject *parent) :
     QObject(parent)
 {
     emit versionChanged();
+
+    qDebug() << "here we go";
+
+    t = new QtTelnet();
+
+    t->connect(t, SIGNAL(connected()), this, SLOT(telnetConnected()));
+    t->connect(t, SIGNAL(connectionError(QAbstractSocket::SocketError)), this, SLOT(telnetError(QAbstractSocket::SocketError)));
+
+
+
 }
 
 Telnet::~Telnet()
@@ -25,3 +37,20 @@ QString Telnet::readVersion()
     return APPVERSION;
 }
 
+void Telnet::connectToTelnet(QString host)
+{
+    qDebug() << "Connecting to" << host;
+    t->connectToHost(host);
+}
+
+
+void Telnet::telnetConnected()
+{
+    qDebug() << "telnet connected";
+    t->close();
+}
+
+void Telnet::telnetError(QAbstractSocket::SocketError err)
+{
+    qDebug() << "error" << err;
+}

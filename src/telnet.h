@@ -5,6 +5,7 @@
 #ifndef TELNET_H
 #define TELNET_H
 #include <QObject>
+#include "qttelnet.h"
 
 class Telnet : public QObject
 {
@@ -17,11 +18,18 @@ public:
 
     QString readVersion();
 
+    Q_INVOKABLE void connectToTelnet(QString host);
+
 signals:
     void versionChanged();
 
-    //private:
+public slots:
+    void telnetConnected();
+    void telnetError(QAbstractSocket::SocketError);
 
+private:
+
+    QtTelnet* t;
 };
 
 

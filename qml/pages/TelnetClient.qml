@@ -45,6 +45,12 @@ Page
                 color: Theme.primaryColor
                 font.pixelSize: Theme.fontSizeExtraLarge
             }
+            Button
+            {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "connect"
+                onClicked: telnet.connectToTelnet("192.168.10.43")
+            }
         }
     }
 

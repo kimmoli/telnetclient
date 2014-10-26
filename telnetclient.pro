@@ -11,9 +11,11 @@ DEFINES += "APPVERSION=\\\"$${SPECVERSION}\\\""
 message($${DEFINES})
 
 SOURCES += src/telnetclient.cpp \
-	src/telnet.cpp
+	src/telnet.cpp \
+    src/qttelnet.cpp
 	
-HEADERS += src/telnet.h
+HEADERS += src/telnet.h \
+    src/qttelnet.h
 
 OTHER_FILES += qml/telnetclient.qml \
     qml/cover/CoverPage.qml \
