@@ -18,13 +18,20 @@ Telnet::Telnet(QObject *parent) :
     emit versionChanged();
 
     qDebug() << "here we go";
+    m_data = "N/A";
+    m_connected = false;
+    m_connecting = false;
+
+    emit dataChanged();
+    emit connectedChanged();
 
     t = new QtTelnet();
 
     t->connect(t, SIGNAL(connected()), this, SLOT(telnetConnected()));
     t->connect(t, SIGNAL(connectionError(QAbstractSocket::SocketError)), this, SLOT(telnetError(QAbstractSocket::SocketError)));
-
-
+    t->connect(t, SIGNAL(message(const QString&)), this, SLOT(telnetReceive(const QString&)));
+    t->connect(t, SIGNAL(loggedIn()), this, SLOT(telnetLoggedIn()));
+    t->connect(t, SIGNAL(loginFailed()), this, SLOT(telnetLoginFailed()));
 
 }
 
@@ -41,16 +48,58 @@ void Telnet::connectToTelnet(QString host)
 {
     qDebug() << "Connecting to" << host;
     t->connectToHost(host);
+    m_connecting = true;
+    emit connectingChanged();
 }
 
 
 void Telnet::telnetConnected()
 {
     qDebug() << "telnet connected";
+
+    m_connected = true;
+    emit connectedChanged();
+    m_connecting = false;
+    emit connectingChanged();
+}
+
+void Telnet::disconnectTelnet()
+{
+    qDebug() << "disconnect";
+
     t->close();
+    m_connected = false;
+    emit connectedChanged();
 }
 
 void Telnet::telnetError(QAbstractSocket::SocketError err)
 {
-    qDebug() << "error" << err;
+    qDebug() << "error:" << err;
+    m_connecting = false;
+    emit connectingChanged();
+}
+
+void Telnet::telnetReceive(const QString &data)
+{
+    qDebug() << "receive:" << data;
+
+    m_data = data;
+    emit dataChanged();
+}
+
+void Telnet::telnetLoggedIn()
+{
+    qDebug() << "telnet logged in";
+}
+
+void Telnet::telnetLoginFailed()
+{
+    qDebug() << "telnet login failed";
+    t->close();
+}
+
+void Telnet::telnetSend(QString data)
+{
+    qDebug() << "send:" << data;
+    t->sendData(data.append("\r\n"));
 }

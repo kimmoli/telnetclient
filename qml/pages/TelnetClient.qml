@@ -9,6 +9,13 @@ Page
 {
     id: page
 
+    BusyIndicator
+    {
+        anchors.centerIn: parent
+        running: telnet.connecting
+        visible: telnet.connecting
+    }
+
     SilicaFlickable
     {
         anchors.fill: parent
@@ -45,12 +52,41 @@ Page
                 color: Theme.primaryColor
                 font.pixelSize: Theme.fontSizeExtraLarge
             }
+
             Button
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "connect"
-                onClicked: telnet.connectToTelnet("192.168.10.43")
+                text: telnet.connected ? "disconnect" : "connect"
+                onClicked:
+                {
+                    if (telnet.connected)
+                        telnet.disconnectTelnet()
+                    else
+                        telnet.connectToTelnet("192.168.10.43")
+                }
             }
+
+            TextField
+            {
+                id: sendData
+                placeholderText: "Enter something here"
+                //inputMethodHints: Qt.ImhPreferUppercase| Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                width: parent.width - 100
+                //validator: RegExpValidator { regExp: /[0-9a-fA-F]{1,2}/ }
+                anchors.horizontalCenter: parent.horizontalCenter
+                EnterKey.onClicked: telnet.telnetSend(sendData.text)
+            }
+
+            Label
+            {
+                id: readData
+                width: parent.width - 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                wrapMode: Text.Wrap
+                text: telnet.data
+            }
+
+
         }
     }
 
