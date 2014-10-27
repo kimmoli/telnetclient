@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "telnet.h"
 #include "qttelnet.h"
 #include <QDebug>
+#include <QStringList>
 
 Telnet::Telnet(QObject *parent) :
     QObject(parent)
@@ -30,8 +31,6 @@ Telnet::Telnet(QObject *parent) :
     t->connect(t, SIGNAL(connected()), this, SLOT(telnetConnected()));
     t->connect(t, SIGNAL(connectionError(QAbstractSocket::SocketError)), this, SLOT(telnetError(QAbstractSocket::SocketError)));
     t->connect(t, SIGNAL(message(const QString&)), this, SLOT(telnetReceive(const QString&)));
-    t->connect(t, SIGNAL(loggedIn()), this, SLOT(telnetLoggedIn()));
-    t->connect(t, SIGNAL(loginFailed()), this, SLOT(telnetLoginFailed()));
 
 }
 
@@ -46,8 +45,14 @@ QString Telnet::readVersion()
 
 void Telnet::connectToTelnet(QString host)
 {
-    qDebug() << "Connecting to" << host;
-    t->connectToHost(host);
+    qint16 port = 23;
+
+    QStringList hostPort = host.split(":");
+    if (hostPort.count() == 2)
+        port = hostPort.at(1).toInt();
+
+    qDebug() << "Connecting to" << host << port;
+    t->connectToHost(hostPort.at(0), port);
     m_connecting = true;
     emit connectingChanged();
 }
@@ -85,17 +90,6 @@ void Telnet::telnetReceive(const QString &data)
 
     m_data = data;
     emit dataChanged();
-}
-
-void Telnet::telnetLoggedIn()
-{
-    qDebug() << "telnet logged in";
-}
-
-void Telnet::telnetLoginFailed()
-{
-    qDebug() << "telnet login failed";
-    t->close();
 }
 
 void Telnet::telnetSend(QString data)

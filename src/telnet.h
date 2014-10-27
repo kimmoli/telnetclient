@@ -38,8 +38,6 @@ public slots:
     void telnetConnected();
     void telnetError(QAbstractSocket::SocketError);
     void telnetReceive(const QString &data);
-    void telnetLoggedIn();
-    void telnetLoginFailed();
 
 private:
 

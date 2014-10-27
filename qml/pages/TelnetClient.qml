@@ -45,12 +45,17 @@ Page
             {
                 title: "Telnetclient"
             }
-            Label
+
+            TextField
             {
-                x: Theme.paddingLarge
-                text: "Hello you"
-                color: Theme.primaryColor
-                font.pixelSize: Theme.fontSizeExtraLarge
+                id: hostAddress
+                placeholderText: "host:port"
+                text: "192.168.10.43"
+                inputMethodHints: Qt.ImhPreferLowercase
+                width: parent.width - 100
+                //validator: RegExpValidator { regExp: /^\S+([:]\d+){1}|^[^:]+$/ }
+                anchors.horizontalCenter: parent.horizontalCenter
+                EnterKey.onClicked: telnet.telnetSend(sendData.text)
             }
 
             Button
@@ -62,7 +67,7 @@ Page
                     if (telnet.connected)
                         telnet.disconnectTelnet()
                     else
-                        telnet.connectToTelnet("192.168.10.43")
+                        telnet.connectToTelnet(hostAddress.text)
                 }
             }
 
@@ -70,7 +75,7 @@ Page
             {
                 id: sendData
                 placeholderText: "Enter something here"
-                //inputMethodHints: Qt.ImhPreferUppercase| Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                inputMethodHints: Qt.ImhPreferLowercase
                 width: parent.width - 100
                 //validator: RegExpValidator { regExp: /[0-9a-fA-F]{1,2}/ }
                 anchors.horizontalCenter: parent.horizontalCenter
